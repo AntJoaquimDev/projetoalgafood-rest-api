@@ -1,0 +1,120 @@
+package com.algafood.cursoapi.infrastructure.repository;
+
+******************
+CONSULTA DINAMICA
+*******************
+
+@Repository
+public class RestauranteRepositoryImpl implements RestauranteRepositoryQuerys {
+
+	@PersistenceContext
+	private EntityManager manager;
+
+	@Override
+	public List<Restaurante> find(String nome, BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal) {
+		/**
+		 * var jpql = "from Restaurante where nome like :nome " + "and taxaFrete between
+		 * :taxaInicial and :taxaFinal";
+		 * 
+		 * 
+		 * var jpql = "from Restaurante where nome like :nome " + "and taxaFrete between
+		 * :taxaInicial and :taxaFinal";
+		 * 
+		 * return manager.createQuery(jpql,Restaurante.class) .setParameter("nome","%" +
+		 * nome + "%") .setParameter("taxaInicial", taxaFreteInicial)
+		 * .setParameter("taxaFinal", taxaFreteFinal) .getResultList(); }
+		 */
+		
+		
+		var jpql = new StringBuilder();
+
+		jpql.append("from Restaurante where  0 = 0 ");
+		var parametros = new HashMap<String, Object>();
+
+		if (StringUtils.hasLength(nome)) {
+			jpql.append("and nome like :nome ");
+			parametros.put("nome", "%" + nome + "%");
+			System.out.println(nome);
+		}
+
+		if (taxaFreteInicial != null) {
+			jpql.append("and taxaFrete >= :taxaInicial ");
+			parametros.put("TaxaInicial", taxaFreteInicial);
+			System.out.println(taxaFreteInicial);
+		}
+
+		if (taxaFreteFinal != null) {
+			jpql.append("and taxaFrete <= :taxaFinal ");
+			parametros.put("TaxaFinal", taxaFreteFinal);
+			System.out.println(taxaFreteFinal);
+		}
+
+		TypedQuery<Restaurante> query = manager.createQuery(jpql.toString(), Restaurante.class);
+
+		parametros.forEach((chave, valor) -> query.setParameter(chave, valor));
+		
+         System.out.println(query.toString());
+		return query.getResultList();
+
+	}
+}
+
+
+*/*/*/*/***************/*/**///////////////
+/**
+		 * var jpql = "from Restaurante where nome like :nome " + "and taxaFrete between
+		 * :taxaInicial and :taxaFinal";
+		 * 
+		 * 
+		 * var jpql = "from Restaurante where nome like :nome " + "and taxaFrete between
+		 * :taxaInicial and :taxaFinal";
+		 * 
+		 * return manager.createQuery(jpql,Restaurante.class) .setParameter("nome","%" +
+		 * nome + "%") .setParameter("taxaInicial", taxaFreteInicial)
+		 * .setParameter("taxaFinal", taxaFreteFinal) .getResultList(); }
+		 */
+		 
+		 
+		 
+		 
+		 //Consulta com Criteria API
+		 
+		 
+		 
+@Repository
+public class RestauranteRepositoryImpl implements RestauranteRepositoryQuerys {
+
+	@PersistenceContext
+	private EntityManager manager;
+
+	@Override
+	public List<Restaurante> find(String nome, BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal) {
+		
+		CriteriaBuilder builder= manager.getCriteriaBuilder();
+		
+		CriteriaQuery<Restaurante> critera = builder.createQuery(Restaurante.class);
+		
+		Root<Restaurante > root = critera.from(Restaurante.class);
+		
+		Predicate nomePrdicate = builder.like(root.get("nome"),"%" +nome+"%");
+		
+		Predicate taxaInicialPredicate = builder
+				.greaterThanOrEqualTo(root.get("taxaFrete"), taxaFreteInicial);
+		Predicate taxaFinalPredicate = builder
+				.lessThanOrEqualTo(root.get("taxaFrete"), taxaFreteFinal);
+		
+		critera.where(nomePrdicate, taxaInicialPredicate,taxaFinalPredicate);
+		
+         TypedQuery<Restaurante> query = manager.createQuery(critera);
+         
+         return query.getResultList();
+		
+
+	}
+	
+	
+	
+	//testes
+	//List<Restaurante> consultarPorNome(String nome,@Param("id") Long cozinha);	
+	//public List<Restaurante> find(String nome,BigDecimal taxaFreteInicial,BigDecimal taxaFreteFinal);
+		
