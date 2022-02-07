@@ -37,9 +37,9 @@ public class RestauranteController {
 	public List<Restaurante> listar() {
 		return restauranteRepository.findAll();
 	}
-	
+
 	@GetMapping("/por-taxa-frete")
-	public List<Restaurante> restPorTaxa(BigDecimal taxaInicial, BigDecimal taxaFinal){
+	public List<Restaurante> restPorTaxa(BigDecimal taxaInicial, BigDecimal taxaFinal) {
 		return cadastroRestaurante.buscarPorTaxaFrete(taxaInicial, taxaFinal);
 	}
 
@@ -72,17 +72,24 @@ public class RestauranteController {
 	}
 
 	@PutMapping("/{restauranteId}")
-	public ResponseEntity<?> atualizar(@PathVariable long restauranteId,
-			@RequestBody Restaurante restaurante) {
+	public ResponseEntity<?> atualizar(@PathVariable long restauranteId, @RequestBody Restaurante restaurante) {
 
-		if (!restauranteRepository.existsById(restauranteId)) {
+		try {
+
+			Restaurante restauranteAtual = restauranteRepository.findById(restauranteId).orElse(null);
+
+			if (restauranteAtual != null) {
+
+				BeanUtils.copyProperties(restaurante, restauranteAtual, "id", "formaPagamento");
+
+				restauranteAtual = cadastroRestaurante.salvar(restauranteAtual);
+				return ResponseEntity.ok(restauranteAtual);
+			}
 			return ResponseEntity.notFound().build();
+			
+		} catch (EntidadeNaoEncontradaException e) {
+			return ResponseEntity.badRequest().body(e.getMessage());
 		}
-		restaurante.setId(restauranteId);
-		BeanUtils.copyProperties(restaurante, restaurante, "id");
-		cadastroRestaurante.salvar(restaurante);
-
-		return ResponseEntity.ok(restaurante);
 
 	}
 
@@ -101,19 +108,19 @@ public class RestauranteController {
 		}
 
 	}
-	
 
 	@GetMapping("/por-nome-e-frete")
-	public List<Restaurante> restaurantesPorNomeFrete(String nome, 
-			BigDecimal taxaFreteInicial, BigDecimal taxaFreteFinal) {
+	public List<Restaurante> restaurantesPorNomeFrete(String nome, BigDecimal taxaFreteInicial,
+			BigDecimal taxaFreteFinal) {
 		return restauranteRepository.find(nome, taxaFreteInicial, taxaFreteFinal);
 	}
-	
+
 	@GetMapping("/com-nome-e-freteGratis")
-	public List<Restaurante> restaurantesComFreteGratis(String nome	) {
-		
+	public List<Restaurante> restaurantesComFreteGratis(String nome) {
+
 		return restauranteRepository.findComFreteGratis(nome);
 	}
+
 	@GetMapping("/primeiro")
 	public Optional<Restaurante> restaurantePrimeiro() {
 		return restauranteRepository.buscarPrimeiro();
