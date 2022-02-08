@@ -1,35 +1,29 @@
 package com.algafood.cursoapi.domain.model;
 
 import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.Embeddable;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
-@Entity
+@Embeddable
 @Data
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Endereco {
 
-	@Id
-	@EqualsAndHashCode.Include
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	@Column
+	
+	@Column(name ="endereco_cep")
 	private String cep;
-	@Column
+	@Column(name ="endereco_logradouro")
 	private String logradouro;
-	@Column
+	@Column(name ="endereco_numero")
 	private String numero;
-	@Column
+	@Column(name ="endereco_complemento")
 	private String complemento;
-	@Column
+	@Column(name ="endereco_bairro")
 	private String bairro; 
 	@ManyToOne
+	@JoinColumn(name= "endereco_cidade_id")
 	private Cidade cidade;
 	
 	
