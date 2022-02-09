@@ -117,4 +117,23 @@ public class RestauranteRepositoryImpl implements RestauranteRepositoryQuerys {
 	//testes
 	//List<Restaurante> consultarPorNome(String nome,@Param("id") Long cozinha);	
 	//public List<Restaurante> find(String nome,BigDecimal taxaFreteInicial,BigDecimal taxaFreteFinal);
+	
+	
+	
+	
+	
+	
+	
+	
+	testes de lambda
+	
+	System.out.println(restaurantes.get(0).getNome());
+		restaurantes.get(0).getFormaPagamento().forEach((e) -> System.out.println(e));
+		
+		System.out.println(restaurantes.get(1).getNome());
+		restaurantes.get(1).getFormaPagamento().forEach(System.out::println);
+		
+		
+		System.out.println(restaurantes.get(0).getNome());
+		restaurantes.get(0).getFormaPagamento().forEach(System.out::println);
 		

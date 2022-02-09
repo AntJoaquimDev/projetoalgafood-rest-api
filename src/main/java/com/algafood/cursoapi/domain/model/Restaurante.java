@@ -8,6 +8,7 @@ import java.util.List;
 import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -42,19 +43,19 @@ public class Restaurante {
 	@Column(name = "taxa_frete", nullable = false)
 	private BigDecimal taxaFrete;
 	
-	@ManyToOne
+	@JsonIgnore
+	@ManyToOne(fetch = FetchType.LAZY)//mudando pradao EAGER p/lazy
 	@JoinColumn(name="cozinha_id")
 	private Cozinha cozinha;
 	
-	@JsonIgnore
-	@ManyToMany
+	//@JsonIgnore
+	@ManyToMany //(fetch = FetchType.EAGER) //mudando pradao LAZY p/Eager nao é muito comun é perigoso
 	@JoinTable(name= "restaurante_forma_pagamento",
 			joinColumns = @JoinColumn(name= "restaurante_id"),
 			inverseJoinColumns = @JoinColumn(name= "forma_pagamento_id"))
 	private List<FormaPagamento> formaPagamento = new  ArrayList<>() ;
 	
-	@ManyToOne
-	private Usuario usuario;
+	
 	
 	@JsonIgnore
 	@Embedded
@@ -64,18 +65,17 @@ public class Restaurante {
 	@CreationTimestamp
 	@Column(nullable = false, columnDefinition = "datetime")
 	private LocalDateTime dataCadastro;
+	
 	@JsonIgnore
 	@UpdateTimestamp
 	@Column(nullable = false,columnDefinition = "datetime")
 	private LocalDateTime dataAtualizacao;
 	
+		
 	@JsonIgnore
-	@ManyToMany
-	@JoinTable(name= "restaurante_forma_pagamento",
-			joinColumns = @JoinColumn(name= "restaurante_id"),
-			inverseJoinColumns = @JoinColumn(name= "forma_pagamento_id"))
-	private List<FormaPagamento> formaPagamento2 = new  ArrayList<>() ;
-	
 	@OneToMany
-	private List<Produto> produtos = new ArrayList<>();
+	private List<Produto> produtos = new ArrayList<>();	
+	
+	@ManyToOne(fetch = FetchType.LAZY)//mudando pradao EAGER p/lazy
+	private Usuario usuario;
 }
