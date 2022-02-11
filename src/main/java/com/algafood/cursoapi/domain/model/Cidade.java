@@ -21,6 +21,6 @@ public class Cidade {
 	private Long id;
 	@Column
 	private String nome;
-	@ManyToOne
+	@ManyToOne	
 	private Estados estado;
 }

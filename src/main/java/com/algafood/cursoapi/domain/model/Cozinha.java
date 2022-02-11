@@ -27,7 +27,7 @@ public class Cozinha {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@JsonProperty("nome")
-	@Column(name = "cozinha")
+	@Column
 	private String nome;
 	
 	@JsonIgnore
