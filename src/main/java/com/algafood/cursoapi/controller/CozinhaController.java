@@ -7,6 +7,7 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseEntity.BodyBuilder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -73,21 +74,30 @@ public class CozinhaController {
 		return cadastroCozinha.buscarPorNome(nome);
 	}
 
-	@DeleteMapping("/{cozinhaId}")
-	public ResponseEntity<Cozinha> remover(@PathVariable Long cozinhaId) {
+	//@DeleteMapping("/{cozinhaId}")
+//	public ResponseEntity<?> remover(@PathVariable Long cozinhaId) {
+//
+//		try {
 
-		try {
-
-			cadastroCozinha.excluir(cozinhaId);
-			return ResponseEntity.noContent().build();
+	//		cadastroCozinha.excluir(cozinhaId);
+	//		return ResponseEntity.noContent().build();
 			
-		} catch (EntidadeNaoEncontradaException e) {
-			return ResponseEntity.notFound().build();
+//		} catch (EntidadeNaoEncontradaException e) {
+	//		return ((BodyBuilder) ResponseEntity.notFound()).body(e.getMessage());
 
-		} catch (EntidadeEmUsoException e) {
-			return ResponseEntity.status(HttpStatus.CONFLICT).build();
-		}
+		//} catch (EntidadeEmUsoException e) {
+		//	return ResponseEntity.status(HttpStatus.CONFLICT)
+		//			.body(e.getMessage());
+	//	}
+		
+	//}
+	
+	
+	@DeleteMapping("/{cozinhaId}")
+	public void remover(@PathVariable Long cozinhaId) {	
 
+			cadastroCozinha.excluir(cozinhaId);			
+	
 		
 	}
 }
