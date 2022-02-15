@@ -137,3 +137,42 @@ public class RestauranteRepositoryImpl implements RestauranteRepositoryQuerys {
 		System.out.println(restaurantes.get(0).getNome());
 		restaurantes.get(0).getFormaPagamento().forEach(System.out::println);
 		
+		
+		
+		*-*---*-*-*-*-*-*-*-*- Metod Excluir  *-*-**-*---*-*--
+		
+	@DeleteMapping("/{cozinhaId}")
+	public ResponseEntity<?> remover(@PathVariable Long cozinhaId) {
+
+		try {
+
+			cadastroCozinha.excluir(cozinhaId);
+			return ResponseEntity.noContent().build();
+			
+		} catch (EntidadeNaoEncontradaException e) {
+			return ((BodyBuilder) ResponseEntity.notFound()).body(e.getMessage());
+
+		} catch (EntidadeEmUsoException e) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body(e.getMessage());
+		}
+		
+	}
+		*-*---*-*-*-*-*-*-*-*- Metod Atualizar  *-*-**-*---*-*--
+		
+		@PutMapping("/{cozinhaId}")
+	public ResponseEntity<Cozinha> atualizar(@PathVariable Long cozinhaId, @RequestBody Cozinha cozinha) {
+		
+		Optional<Cozinha> cozinhaAtual= cozinhaRepository.findById(cozinhaId);
+		if (!cozinhaRepository.existsById(cozinhaId)) {
+			return ResponseEntity.notFound().build();
+		}
+		cozinha.setId(cozinhaId);
+		//
+		BeanUtils.copyProperties(cozinha, cozinhaAtual.get(),"id"); 
+		Cozinha cozinhaSalva = cadastroCozinha.salvar(cozinhaAtual.get());
+		return ResponseEntity.ok(cozinhaSalva);
+	}
+	
+		
+		

@@ -18,21 +18,26 @@ import com.algafood.cursoapi.domain.repository.RestauranteRepository;
 @Service
 public class CadastroRestauranteService {
 
+	private static final String RESTAURANTE_PODE_SER_REMOVIDA_EM_USO = "Restaurante de Código %d não pode ser removida, pois està em uso";
+
+	private static final String MSG_RESTAURANTE_NAO_ENCONTRADO = "Não existe um cadastro de Restaurante com o código %d";
+
 	@Autowired
 	private RestauranteRepository restauranteRepository;
 
+	
 	@Autowired
-	CozinhaRepository cozinhaRepository;
+	CadastroCozinhaService cadastroCozinhaService;
 
+	
 	public Restaurante salvar(Restaurante restaurante) {
 		Long cozinhaId = restaurante.getCozinha().getId();
 
-		Cozinha cozinha = cozinhaRepository.findById(cozinhaId)
-				.orElseThrow(() -> new EntidadeNaoEncontradaException(
-						String.format("Não existe cadastro de cozinha com o código %d ", cozinhaId)));
-				restaurante.setCozinha(cozinha);
+		Cozinha cozinha = cadastroCozinhaService.buscarOuFalhar(cozinhaId);
 
-				return restauranteRepository.saveAndFlush(restaurante);
+		restaurante.setCozinha(cozinha);
+
+		return restauranteRepository.save(restaurante);
 	}
 
 	public void excluir(Long restauranteId) {
@@ -41,16 +46,22 @@ public class CadastroRestauranteService {
 
 		} catch (EmptyResultDataAccessException e) {
 			throw new EntidadeNaoEncontradaException(
-					String.format("Não existe um cadastro de Restaurante com o código %d", restauranteId));
+					String.format(MSG_RESTAURANTE_NAO_ENCONTRADO, restauranteId));
 
 		} catch (DataIntegrityViolationException e) {
 			throw new EntidadeEmUsoException(
-					String.format("Restaurante de Código %d não pode ser removida, pois està em uso", restauranteId));
+					String.format(RESTAURANTE_PODE_SER_REMOVIDA_EM_USO, restauranteId));
 		}
 	}
+	
 	
 	public List<Restaurante> buscarPorTaxaFrete(BigDecimal taxaInicial, BigDecimal taxaFinal) {
 		return restauranteRepository.findByTaxaFreteBetween(taxaInicial, taxaFinal);
 	}
-	
+
+	public Restaurante buscarOuFalhar(Long restauranteId) {
+		return restauranteRepository.findById(restauranteId).orElseThrow(
+				() -> new EntidadeNaoEncontradaException(String.format(MSG_RESTAURANTE_NAO_ENCONTRADO, restauranteId)));
+
+	}
 }

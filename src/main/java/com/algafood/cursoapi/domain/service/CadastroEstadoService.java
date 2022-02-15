@@ -7,31 +7,42 @@ import org.springframework.stereotype.Service;
 
 import com.algafood.cursoapi.domain.exception.EntidadeEmUsoException;
 import com.algafood.cursoapi.domain.exception.EntidadeNaoEncontradaException;
-import com.algafood.cursoapi.domain.model.Estados;
-import com.algafood.cursoapi.domain.repository.EstadosRepository;
+import com.algafood.cursoapi.domain.model.Estado;
+import com.algafood.cursoapi.domain.repository.EstadoRepository;
 
 @Service
 public class CadastroEstadoService {
 
+	private static final String MSG_ESTADO_NÃO_PODE_SER_REMOVIDA_EM_USO 
+	= "Estado de Código %d não pode ser removida, pois està em uso";
+	
+	private static final String MSG_ESTADO_NAO_ENCONTRADO 
+	= "Não existe um cadastro de Estado com o código %d";
+	
 	@Autowired
-	private EstadosRepository estadosRepository;
+	private EstadoRepository estadoRepository;
 
-	public Estados salvar(Estados estado) {
+	public Estado salvar(Estado estado) {
 
-		return estadosRepository.saveAndFlush(estado);
+		return estadoRepository.saveAndFlush(estado);
 	}
 
 	public void excluir(Long estadoId) {
 		try {
-			estadosRepository.deleteById(estadoId);
+			estadoRepository.deleteById(estadoId);
 
 		} catch (EmptyResultDataAccessException e) {
 			throw new EntidadeNaoEncontradaException(
-					String.format("Não existe um cadastro de Estado com o código %d", estadoId));
+					String.format(MSG_ESTADO_NAO_ENCONTRADO, estadoId));
 
 		} catch (DataIntegrityViolationException e) {
 			throw new EntidadeEmUsoException(
-					String.format("Estado de Código %d não pode ser removida, pois està em uso", estadoId));
+					String.format(MSG_ESTADO_NÃO_PODE_SER_REMOVIDA_EM_USO, estadoId));
 		}
+	}
+	
+	public Estado burcarOuFalhar(Long estadoId) {
+		return estadoRepository.findById(estadoId)
+				.orElseThrow(()-> new EntidadeNaoEncontradaException(String.format(MSG_ESTADO_NAO_ENCONTRADO,estadoId)));
 	}
 }

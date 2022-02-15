@@ -40,21 +40,21 @@ public class Restaurante {
 	
 	@Column(nullable = false)
 	private String nome;
+	
 	@Column(name = "taxa_frete", nullable = false)
 	private BigDecimal taxaFrete;
 	
-	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY)//mudando pradao EAGER p/lazy
+	//@JsonIgnore
+	@ManyToOne//(fetch = FetchType.LAZY)//mudando pradao EAGER p/lazy
 	@JoinColumn(name="cozinha_id")
 	private Cozinha cozinha;
 	
-	@JsonIgnore
+    @JsonIgnore
 	@ManyToMany //(fetch = FetchType.EAGER) //mudando pradao LAZY p/Eager nao é muito comun é perigoso
 	@JoinTable(name= "restaurante_forma_pagamento",
 			joinColumns = @JoinColumn(name= "restaurante_id"),
 			inverseJoinColumns = @JoinColumn(name= "forma_pagamento_id"))
-	private List<FormaPagamento> formaPagamento = new  ArrayList<>() ;
-	
+	private List<FormaPagamento> formaPagamento = new  ArrayList<>() ;	
 	
 	
 	@JsonIgnore
@@ -73,7 +73,7 @@ public class Restaurante {
 	
 		
 	@JsonIgnore
-	@OneToMany
+	@OneToMany(mappedBy = "restaurante")
 	private List<Produto> produtos = new ArrayList<>();	
 	
 	//@ManyToOne(fetch = FetchType.LAZY)//mudando pradao EAGER p/lazy

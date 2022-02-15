@@ -40,13 +40,9 @@ public class CozinhaController {
 	}
 
 	@GetMapping("/{cozinhaId}")
-	public ResponseEntity<Cozinha> buscar(@PathVariable Long cozinhaId) {
-		Optional<Cozinha> cozinha = cozinhaRepository.findById(cozinhaId);
-		if (!cozinha.isPresent()) {
-			return ResponseEntity.notFound().build();
-		}
-
-		return ResponseEntity.ok(cozinha.get());
+	public Cozinha buscar(@PathVariable Long cozinhaId) {
+		return cadastroCozinha.buscarOuFalhar(cozinhaId);
+				
 	}
 
 	@ResponseStatus(HttpStatus.CREATED)
@@ -56,48 +52,18 @@ public class CozinhaController {
 	}
 
 	@PutMapping("/{cozinhaId}")
-	public ResponseEntity<Cozinha> atualizar(@PathVariable Long cozinhaId, @RequestBody Cozinha cozinha) {
+	public Cozinha atualizar(@PathVariable Long cozinhaId, @RequestBody Cozinha cozinha) {
 		
-		Optional<Cozinha> cozinhaAtual= cozinhaRepository.findById(cozinhaId);
-		if (!cozinhaRepository.existsById(cozinhaId)) {
-			return ResponseEntity.notFound().build();
-		}
-		cozinha.setId(cozinhaId);
-		//
-		BeanUtils.copyProperties(cozinha, cozinhaAtual.get(),"id"); 
-		Cozinha cozinhaSalva = cadastroCozinha.salvar(cozinhaAtual.get());
-		return ResponseEntity.ok(cozinhaSalva);
-	}
-	
-	@GetMapping("/por-nome")
-	public List<Cozinha> cozinhasPorNome(@RequestParam("nome") String nome){
-		return cadastroCozinha.buscarPorNome(nome);
-	}
-
-	//@DeleteMapping("/{cozinhaId}")
-//	public ResponseEntity<?> remover(@PathVariable Long cozinhaId) {
-//
-//		try {
-
-	//		cadastroCozinha.excluir(cozinhaId);
-	//		return ResponseEntity.noContent().build();
-			
-//		} catch (EntidadeNaoEncontradaException e) {
-	//		return ((BodyBuilder) ResponseEntity.notFound()).body(e.getMessage());
-
-		//} catch (EntidadeEmUsoException e) {
-		//	return ResponseEntity.status(HttpStatus.CONFLICT)
-		//			.body(e.getMessage());
-	//	}
+		Cozinha cozinhaAtual= cadastroCozinha.buscarOuFalhar(cozinhaId);
 		
-	//}
-	
-	
+		BeanUtils.copyProperties(cozinha, cozinhaAtual,"id"); 		
+				
+		return cadastroCozinha.salvar(cozinhaAtual);
+	}
+		
 	@DeleteMapping("/{cozinhaId}")
 	public void remover(@PathVariable Long cozinhaId) {	
-
-			cadastroCozinha.excluir(cozinhaId);			
-	
+			cadastroCozinha.excluir(cozinhaId);		
 		
 	}
 }
