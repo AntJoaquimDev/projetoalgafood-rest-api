@@ -9,6 +9,6 @@ public class RestauranteNaoEncontradoException extends EntidadeNaoEncontradaExce
 		
 	}
 	public RestauranteNaoEncontradoException(Long estadoId) {
-		this(String.format("Não existe um cadastro de Estado com o código %d",estadoId));
+		this(String.format("Não existe um cadastro de Restaurante com o código %d",estadoId));
 	}
 }
