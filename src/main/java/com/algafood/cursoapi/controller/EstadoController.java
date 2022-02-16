@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.algafood.cursoapi.domain.exception.EntidadeEmUsoException;
-import com.algafood.cursoapi.domain.exception.EntidadeNaoEncontradaException;
+import com.algafood.cursoapi.domain.exception.EstadoNaoEncontradoException;
 import com.algafood.cursoapi.domain.model.Estado;
 import com.algafood.cursoapi.domain.repository.EstadoRepository;
 import com.algafood.cursoapi.domain.service.CadastroEstadoService;
@@ -68,7 +68,7 @@ public class EstadoController {
 			cadastroEstados.excluir(estadoId);
 			return ResponseEntity.noContent().build();
 			
-		} catch (EntidadeNaoEncontradaException e) {
+		} catch (EstadoNaoEncontradoException e) {
 			return ResponseEntity.notFound().build();
 
 		} catch (EntidadeEmUsoException e) {

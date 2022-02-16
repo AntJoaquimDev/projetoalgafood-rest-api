@@ -1,7 +1,6 @@
 package com.algafood.cursoapi.domain.model;
 
 import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
