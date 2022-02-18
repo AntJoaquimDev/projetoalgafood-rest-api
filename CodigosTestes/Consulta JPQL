@@ -174,5 +174,12 @@ public class RestauranteRepositoryImpl implements RestauranteRepositoryQuerys {
 		return ResponseEntity.ok(cozinhaSalva);
 	}
 	
-		
+///////////////////////////////////////////////////////////////
+/*
+		 * Padronizando o formato de problemas no corpo de respostas com a RFC 7807
+		 * 
+		 * Problem problem = Problem.builder() .status(status.value())
+		 * .type("http://algafood.com.br/entidade-nao-encontrada")
+		 * .title("Entidade não encontrada") .detail(ex.getMessage()) .build();
+		 */	
 		
