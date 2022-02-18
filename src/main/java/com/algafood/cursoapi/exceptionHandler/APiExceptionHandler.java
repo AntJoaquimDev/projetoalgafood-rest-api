@@ -1,5 +1,10 @@
 package com.algafood.cursoapi.exceptionHandler;
 
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 //import java.time.LocalDateTime;
 
 import org.springframework.http.HttpHeaders;
@@ -14,6 +19,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import com.algafood.cursoapi.domain.exception.EntidadeEmUsoException;
 import com.algafood.cursoapi.domain.exception.EntidadeNaoEncontradaException;
 import com.algafood.cursoapi.domain.exception.NegocioException;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 @ControllerAdvice
 public class APiExceptionHandler extends ResponseEntityExceptionHandler {
@@ -22,17 +28,38 @@ public class APiExceptionHandler extends ResponseEntityExceptionHandler {
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
 			HttpHeaders headers, HttpStatus status, WebRequest request) {
 
+		Throwable rootCause =ExceptionUtils.getRootCause(ex);
+		if(rootCause instanceof InvalidFormatException) {
+			return handleInvalidFormatException((InvalidFormatException)rootCause,headers,status,request);
+		}
 		
 		ProblemType problemType = ProblemType.MENSAGEM_INCOMPREENSIVEL;
-		var detail = "O corpo da requisição esta inválido. Verifique o erro da sintaxe.";
+		var detail = "O corpo da requisição está inválido. Verifique o erro da sintaxe.";
 
 		Problem problem = createProblemBilder(status, problemType, detail).build();
 
 		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
 
 	}
-		
 	
+	private ResponseEntity<Object> handleInvalidFormatException(InvalidFormatException ex,
+			HttpHeaders headers, HttpStatus status, WebRequest request) {
+			
+		ProblemType problemType = ProblemType.MENSAGEM_INCOMPREENSIVEL;
+		
+	String path = ex.getPath().stream()
+			.map(ref->ref.getFieldName())
+			.collect(Collectors.joining("."));		
+		
+		var detail = String.format("A propriedade '%s' recebeu o valor '%s', "+
+		"que é de um tipo inválido. Corrija e informe um valor compatível com o tipo '%s",path, ex.getValue(),ex.getTargetType().getSimpleName());
+		
+		Problem problem =createProblemBilder(status, problemType, detail).build();
+				
+		
+		return handleExceptionInternal(ex, problem, headers, status, request);
+	}		
+
 	@ExceptionHandler(EntidadeEmUsoException.class)
 	public ResponseEntity<?> handleEntidadeEmUsoExceptionException(EntidadeEmUsoException ex, WebRequest request) {
 
@@ -78,7 +105,6 @@ public class APiExceptionHandler extends ResponseEntityExceptionHandler {
 
 		if (body == null) {
 			body = Problem.builder()
-
 					.title(status.getReasonPhrase()).status(status.value()).build();
 		} else if (body instanceof String) {
 			body = Problem.builder().title(status.getReasonPhrase()).status(status.value()).build();
@@ -90,6 +116,6 @@ public class APiExceptionHandler extends ResponseEntityExceptionHandler {
 	private Problem.ProblemBuilder createProblemBilder(HttpStatus status, ProblemType problemType, String detail) {
 		return Problem.builder().status(status.value()).type(problemType.getUri()).title(problemType.getTitle())
 				.detail(detail);
+	}	
 
-	}
 }
