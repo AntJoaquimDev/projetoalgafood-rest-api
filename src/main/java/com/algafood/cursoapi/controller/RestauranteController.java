@@ -49,24 +49,39 @@ public class RestauranteController {
 	public List<Restaurante> listar() {
 		return restauranteRepository.findAll();
 	}
+	
+	@GetMapping("/{restauranteId}")
+	public Restaurante buscar(@PathVariable long restauranteId) {
+		if(true) {
+			throw new IllegalArgumentException("teste");
+		}
+			
+		return cadastroRestaurante.buscarOuFalhar(restauranteId);
+
+	}
 
 	@GetMapping("/por-taxa-frete")
 	public List<Restaurante> restPorTaxa(BigDecimal taxaInicial, BigDecimal taxaFinal) {
 		return cadastroRestaurante.buscarPorTaxaFrete(taxaInicial, taxaFinal);
 	}
-
-	@GetMapping("/{restauranteId}")
-	public Restaurante buscar(@PathVariable long restauranteId) {
-
-		return cadastroRestaurante.buscarOuFalhar(restauranteId);
-
+	
+	@GetMapping("/por-nome-e-frete")
+	public List<Restaurante> restaurantesPorNomeFrete(String nome, BigDecimal taxaFreteInicial,
+			BigDecimal taxaFreteFinal) {
+		return restauranteRepository.find(nome, taxaFreteInicial, taxaFreteFinal);
 	}
 
-	public Restaurante Adicionar(Restaurante restaurante) {
+	@GetMapping("/com-nome-e-freteGratis")
+	public List<Restaurante> restaurantesComFreteGratis(String nome) {
 
-		return restauranteRepository.saveAndFlush(restaurante);
+		return restauranteRepository.findComFreteGratis(nome);
 	}
 
+	@GetMapping("/primeiro")
+	public Optional<Restaurante> restaurantePrimeiro() {
+		return restauranteRepository.buscarPrimeiro();
+	}
+	
 	@PostMapping()
 	@ResponseStatus(HttpStatus.CREATED)
 	public Restaurante adicionar(@RequestBody Restaurante restaurante) {
@@ -99,22 +114,6 @@ public class RestauranteController {
 
 	}
 
-	@GetMapping("/por-nome-e-frete")
-	public List<Restaurante> restaurantesPorNomeFrete(String nome, BigDecimal taxaFreteInicial,
-			BigDecimal taxaFreteFinal) {
-		return restauranteRepository.find(nome, taxaFreteInicial, taxaFreteFinal);
-	}
-
-	@GetMapping("/com-nome-e-freteGratis")
-	public List<Restaurante> restaurantesComFreteGratis(String nome) {
-
-		return restauranteRepository.findComFreteGratis(nome);
-	}
-
-	@GetMapping("/primeiro")
-	public Optional<Restaurante> restaurantePrimeiro() {
-		return restauranteRepository.buscarPrimeiro();
-	}
 
 	@PatchMapping("/{restauranteId}")
 	public Restaurante atualizarParcial(@PathVariable Long restauranteId, @RequestBody Map<String, Object> campos,

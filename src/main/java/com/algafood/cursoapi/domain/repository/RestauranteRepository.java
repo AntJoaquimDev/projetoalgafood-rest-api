@@ -13,7 +13,7 @@ import com.algafood.cursoapi.domain.model.Restaurante;
 public interface RestauranteRepository extends CustomJpaRepository <Restaurante, Long>,RestauranteRepositoryQuerys ,
 				 JpaSpecificationExecutor<Restaurante> {
 
-	@Query("from Restaurante r join fetch  r.cozinha join fetch r.formaPagamento")
+	//@Query("from Restaurante r join fetch  r.cozinha join fetch r.formaPagamento")
 	List<Restaurante>findAll();	
 	
 	List<Restaurante> findByTaxaFreteBetween(BigDecimal taxaInicial,BigDecimal taxaFinal);
