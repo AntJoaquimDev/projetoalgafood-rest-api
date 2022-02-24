@@ -1,9 +1,12 @@
 package com.algafood.cursoapi.exceptionHandler;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
+
+
 
 //import java.time.LocalDateTime;
 
@@ -21,4 +24,13 @@ public class Problem {
 	private String detail;
 	private LocalDateTime timestamp;
 	private String userMessage;
+	private List<Field> fields;
+	
+	@Builder
+	@Getter
+	public static class Field{
+		private String name;
+		private String userMessage;
+	}
+
 }

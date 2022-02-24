@@ -13,6 +13,9 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
@@ -50,7 +53,8 @@ public class APiExceptionHandler extends ResponseEntityExceptionHandler {
 		ProblemType problemType = ProblemType.MENSAGEM_INCOMPREENSIVEL;
 		var detail = "O corpo da requisição está inválido. Verifique o erro da sintaxe.";
 
-		Problem problem = createProblemBilder(status, problemType, detail).build();
+		Problem problem = createProblemBilder(status, problemType, detail)
+				.userMessage(MSG_ERRO_GENERICO_USUARIO_FINAL).build();
 
 		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
 
@@ -80,7 +84,9 @@ public class APiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		ProblemType problemType = ProblemType.ERRP_DE_SISTEMA;
 		var detail = MSG_ERRO_GENERICO_USUARIO_FINAL;
-		Problem problem = createProblemBilder(status, problemType, detail).build();
+		Problem problem = createProblemBilder(status, problemType, detail)
+				.userMessage(MSG_ERRO_GENERICO_USUARIO_FINAL)
+				.build();
 		return handleExceptionInternal(ex, problem, new HttpHeaders(),status, request);
 	}
 			
@@ -96,6 +102,31 @@ public class APiExceptionHandler extends ResponseEntityExceptionHandler {
 		return super.handleTypeMismatch(ex, headers, status, request);
 	}
 
+	@Override
+	protected ResponseEntity<Object>handleMethodArgumentNotValid(MethodArgumentNotValidException ex, HttpHeaders headers,
+			HttpStatus status, WebRequest request) {
+		
+		BindingResult bindingResult = ex.getBindingResult();
+		
+		List<Problem.Field> problemFields =bindingResult.getFieldErrors()
+				.stream()
+				.map(FieldError -> Problem.Field.builder()
+				.name(FieldError.getField())
+				.userMessage(FieldError.getDefaultMessage())
+				.build())
+				.collect(Collectors.toList());
+		
+;		ProblemType problemType =ProblemType.DADOS_INVALIDOS;		  
+	    String detail = String.format("Um ou mais campos estão inválidos. Faça o preenchemneto corrteo e tente novamente");
+			
+		Problem problem = createProblemBilder(status, problemType, detail)
+				.userMessage(detail)
+				.fields(problemFields)
+				.build();
+		System.out.println("teste02");
+		return handleExceptionInternal(ex, problem,headers, status, request);
+	}
+	
 	@Override
 	protected ResponseEntity<Object> handleNoHandlerFoundException(NoHandlerFoundException ex, HttpHeaders headers,
 			HttpStatus status, WebRequest request) {
@@ -180,7 +211,9 @@ public class APiExceptionHandler extends ResponseEntityExceptionHandler {
 		ProblemType problemType = ProblemType.ERRO_NEGOCIO;
 		var detail = ex.getMessage();
 
-		Problem problem = createProblemBilder(status, problemType, detail).build();
+		Problem problem = createProblemBilder(status, problemType, detail)
+				.userMessage(MSG_ERRO_GENERICO_USUARIO_FINAL)
+				.build();
 
 		return handleExceptionInternal(ex, problem, new HttpHeaders(), status, request);
 
@@ -212,8 +245,7 @@ public class APiExceptionHandler extends ResponseEntityExceptionHandler {
 				.timestamp(LocalDateTime.now())
 				.status(status.value())
 				.type(problemType.getUri())
-				.title(problemType.getTitle())
-				
+				.title(problemType.getTitle())				
 				.detail(detail);
 	}
 
