@@ -2,11 +2,14 @@ package com.algafood.cursoapi.exceptionHandler;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.TypeMismatchException;
-
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 //import java.time.LocalDateTime;
 
 import org.springframework.http.HttpHeaders;
@@ -36,6 +39,8 @@ public class APiExceptionHandler extends ResponseEntityExceptionHandler {
 	private static final String MSG_ERRO_GENERICO_USUARIO_FINAL = "Ocorreu um erro interno inesperado no sistema. "
 	        + "Tente novamente e se o problema persistir, entre em contato "
 	        + "com o administrador do sistema.";
+	@Autowired
+	private MessageSource messageSource;
 
 	@Override
 	protected ResponseEntity<Object> handleHttpMessageNotReadable(HttpMessageNotReadableException ex,
@@ -110,10 +115,14 @@ public class APiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		List<Problem.Field> problemFields =bindingResult.getFieldErrors()
 				.stream()
-				.map(FieldError -> Problem.Field.builder()
-				.name(FieldError.getField())
-				.userMessage(FieldError.getDefaultMessage())
-				.build())
+				.map(fieldError -> {
+					String message = messageSource.getMessage(fieldError, LocaleContextHolder.getLocale());
+				return Problem.Field.builder()
+					.name(fieldError.getField())
+					.userMessage(message)
+					.build();
+				})
+				
 				.collect(Collectors.toList());
 		
 ;		ProblemType problemType =ProblemType.DADOS_INVALIDOS;		  
@@ -123,7 +132,7 @@ public class APiExceptionHandler extends ResponseEntityExceptionHandler {
 				.userMessage(detail)
 				.fields(problemFields)
 				.build();
-		System.out.println("teste02");
+		
 		return handleExceptionInternal(ex, problem,headers, status, request);
 	}
 	

@@ -36,7 +36,7 @@ public class Pedido {
 	@Embedded
 	private Endereco enderecoEntrega;
 	
-	private EstatusPedidos status;
+	private StatusPedidos status;
 	
 	@CreationTimestamp
 	private LocalDateTime dataCriacao;
