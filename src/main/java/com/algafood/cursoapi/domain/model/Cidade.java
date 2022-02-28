@@ -7,6 +7,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -24,6 +25,8 @@ public class Cidade {
 	@NotBlank
 	@Column
 	private String nome;
+	
+	@NotNull
 	@ManyToOne	
 	private Estado estado;
 }
