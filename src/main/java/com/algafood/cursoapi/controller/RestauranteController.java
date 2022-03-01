@@ -17,7 +17,8 @@ import org.springframework.http.MediaType;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
-import org.springframework.validation.annotation.Validated;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.SmartValidator;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -29,7 +30,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.algafood.cursoapi.core.validation.Groups;
+import com.algafood.cursoapi.core.validation.ValidacaoException;
 import com.algafood.cursoapi.domain.exception.EntidadeNaoEncontradaException;
 import com.algafood.cursoapi.domain.exception.NegocioException;
 import com.algafood.cursoapi.domain.model.Restaurante;
@@ -46,6 +47,9 @@ public class RestauranteController {
 	private RestauranteRepository restauranteRepository;
 	@Autowired
 	private CadastroRestauranteService cadastroRestaurante;
+	
+	@Autowired
+	private SmartValidator validator;
 
 	@GetMapping()
 	public List<Restaurante> listar() {
@@ -107,22 +111,28 @@ public class RestauranteController {
 		}
 	}
 
-	@DeleteMapping("/{restauranteId}")
-	public void remover(@PathVariable Long restauranteId) {
-
-		cadastroRestaurante.excluir(restauranteId);
-
-	}
-
-
 	@PatchMapping("/{restauranteId}")
-	public Restaurante atualizarParcial(@PathVariable Long restauranteId, @RequestBody Map<String, Object> campos,
-			HttpServletRequest request) {
+	public Restaurante atualizarParcial(@PathVariable Long restauranteId, 
+			@RequestBody Map<String, Object> campos,HttpServletRequest request) {
+		
 		Restaurante restauranteAtual = cadastroRestaurante.buscarOuFalhar(restauranteId);
 
 		merge(campos, restauranteAtual, request);
+		validate(restauranteAtual, "restaurante");
 
-		return atualizar(restauranteId, restauranteAtual);
+		return atualizar(restauranteId,restauranteAtual);
+	}
+
+	private void validate(Restaurante restaurante, String objectName) {
+		
+		BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(restaurante, objectName);				
+		
+		validator.validate(restaurante ,bindingResult);
+		
+		if (bindingResult.hasErrors()) {
+			throw new ValidacaoException(bindingResult);
+		}
+		
 	}
 
 	private void merge(Map<String, Object> dadosOrigem, Restaurante restauranteDestino, 
@@ -146,6 +156,12 @@ public class RestauranteController {
 			Throwable rootCause = ExceptionUtils.getRootCause(ex);
 			throw new HttpMessageNotReadableException(ex.getMessage(), rootCause,serverHttpRequest);
 		}
+	}
+	@DeleteMapping("/{restauranteId}")
+	public void remover(@PathVariable Long restauranteId) {
+
+		cadastroRestaurante.excluir(restauranteId);
+
 	}
 
 }
