@@ -1,23 +1,4 @@
-package com.algafood.cursoapi;
-
-import static org.assertj.core.api.Assertions.assertThat;
-
-import javax.validation.ConstraintViolationException;
-
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-
-import com.algafood.cursoapi.domain.exception.EntidadeEmUsoException;
-import com.algafood.cursoapi.domain.exception.EntidadeNaoEncontradaException;
-import com.algafood.cursoapi.domain.model.Cozinha;
-import com.algafood.cursoapi.domain.service.CadastroCozinhaService;
-
-@SpringBootTest
-class CadastroCozinhaIntegrationTests {
-
-	@Autowired
+@Autowired
 	public CadastroCozinhaService cadastroCozinhaService;
 	private EntidadeNaoEncontradaException erroEsperado;
 
@@ -38,6 +19,31 @@ class CadastroCozinhaIntegrationTests {
 		assertThat(novaCozinha.getId()).isNotNull();
 	}
 
+	package com.algafood.cursoapi;
+
+import org.springframework.boot.test.context.SpringBootTest;
+import static org.assertj.core.api.Assertions.assertThat;
+
+import javax.validation.ConstraintViolationException;
+
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+
+import com.algafood.cursoapi.domain.exception.EntidadeEmUsoException;
+import com.algafood.cursoapi.domain.exception.EntidadeNaoEncontradaException;
+import com.algafood.cursoapi.domain.model.Cozinha;
+import com.algafood.cursoapi.domain.service.CadastroCozinhaService;
+
+
+@SpringBootTest
+public class CadastroCozinhaIT {
+
+	
+	
+	
+}
 	
 	@Test
 	public void deveFalhar_QuandoCadastroCozinhaSemNome() {
@@ -67,5 +73,4 @@ class CadastroCozinhaIntegrationTests {
 			cadastroCozinhaService.excluir(100l);			
 		});
 	assertThat(erroEsperado);
-	}
-}
+	}	

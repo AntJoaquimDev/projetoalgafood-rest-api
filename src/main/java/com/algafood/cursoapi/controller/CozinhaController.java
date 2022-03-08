@@ -28,6 +28,7 @@ public class CozinhaController {
 	@Autowired
 	CadastroCozinhaService cadastroCozinha;
 
+
 	@GetMapping()
 	public List<Cozinha> listar() {
 		return cozinhaRepository.findAll();
