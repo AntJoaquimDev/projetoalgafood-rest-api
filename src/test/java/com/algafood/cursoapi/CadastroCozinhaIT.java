@@ -2,7 +2,6 @@ package com.algafood.cursoapi;
 
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.hasSize;
 
 import org.junit.Before;
@@ -29,7 +28,7 @@ import io.restassured.http.ContentType;
 public class CadastroCozinhaIT {
 
 	@LocalServerPort
-	private int port;
+	private int port;  
 
 	@Autowired
 	private DatabaseCleaner databaseCleaner;
@@ -42,6 +41,7 @@ public class CadastroCozinhaIT {
 	private int quantidadeCozinhasCadastradas;
 	private String jsonCorretoCozinhaChinesa;
 
+	
 	@Before
 	public void setUp() {
 		RestAssured.enableLoggingOfRequestAndResponseIfValidationFails();
@@ -56,7 +56,12 @@ public class CadastroCozinhaIT {
 	@Test
 	public void deveRetornarStatus200_QuandoConsultarCozinhas() {
 
-		given().accept(ContentType.JSON).when().get().then().statusCode(HttpStatus.OK.value());
+		given()
+			.accept(ContentType.JSON)
+		.when()
+			.get()
+		.then()
+			.statusCode(HttpStatus.OK.value());
 	}
 
 	@Test
