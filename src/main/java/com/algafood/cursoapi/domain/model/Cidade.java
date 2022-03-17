@@ -24,7 +24,7 @@ public class Cidade {
 	
 	@NotBlank
 	@Column
-	private String nome;
+	private String nome;	
 	
 	@NotNull
 	@ManyToOne	
