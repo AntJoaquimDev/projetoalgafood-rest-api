@@ -1,6 +1,6 @@
 package com.algafood.cursoapi.exceptionHandler;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -9,7 +9,7 @@ import org.springframework.beans.TypeMismatchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.MessageSource;
 import org.springframework.context.i18n.LocaleContextHolder;
-//import java.time.LocalDateTime;
+//import java.time.OffsetDateTime;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -246,14 +246,14 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 		
 		if (body == null) {
 			body = Problem.builder()
-				.timestamp(LocalDateTime.now())
+				.timestamp(OffsetDateTime.now())
 				.title(status.getReasonPhrase())
 				.status(status.value())
 				.userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
 				.build();
 		} else if (body instanceof String) {
 			body = Problem.builder()
-				.timestamp(LocalDateTime.now())
+				.timestamp(OffsetDateTime.now())
 				.title((String) body)
 				.status(status.value())
 				.userMessage(MSG_ERRO_GENERICA_USUARIO_FINAL)
@@ -267,7 +267,7 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 			ProblemType problemType, String detail) {
 		
 		return Problem.builder()
-			.timestamp(LocalDateTime.now())
+			.timestamp(OffsetDateTime.now())
 			.status(status.value())
 			.type(problemType.getUri())
 			.title(problemType.getTitle())

@@ -5,6 +5,7 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -36,6 +37,9 @@ import com.algafood.cursoapi.domain.exception.NegocioException;
 import com.algafood.cursoapi.domain.model.Restaurante;
 import com.algafood.cursoapi.domain.repository.RestauranteRepository;
 import com.algafood.cursoapi.domain.service.CadastroRestauranteService;
+import com.algafood.cursoapi.model.CozinhaModel;
+import com.algafood.cursoapi.model.RestauranteModel;
+import com.algafood.cursoapi.model.input.RestauranteInput;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -52,17 +56,19 @@ public class RestauranteController {
 	private SmartValidator validator;
 
 	@GetMapping()
-	public List<Restaurante> listar() {
-		return restauranteRepository.findAll();
+	public List<RestauranteModel> listar() {
+		return toCollectioModel(restauranteRepository.findAll());
 	}
 	
 	@GetMapping("/{restauranteId}")
-	public Restaurante buscar(@PathVariable long restauranteId) {
-				
-		return cadastroRestaurante.buscarOuFalhar(restauranteId);
+	public RestauranteModel buscar(@PathVariable long restauranteId) {
+			
+		Restaurante restaurante = cadastroRestaurante.buscarOuFalhar(restauranteId);	
 
+		 return toModel(restaurante);
 	}
 
+	
 	@GetMapping("/por-taxa-frete")
 	public List<Restaurante> restPorTaxa(BigDecimal taxaInicial, BigDecimal taxaFinal) {
 		return cadastroRestaurante.buscarPorTaxaFrete(taxaInicial, taxaFinal);
@@ -87,32 +93,32 @@ public class RestauranteController {
 	
 	@PostMapping()
 	@ResponseStatus(HttpStatus.CREATED)
-	public Restaurante adicionar(
-			@RequestBody @Valid Restaurante restaurante) {
+	public RestauranteModel adicionar(
+			@RequestBody @Valid RestauranteInput restaurante) {
 
 		try {
-			return cadastroRestaurante.salvar(restaurante);
+			return toModel(cadastroRestaurante.salvar(restaurante));
 		} catch (EntidadeNaoEncontradaException e) {
 			throw new NegocioException(e.getMessage());
 		}
 	}
 
 	@PutMapping("/{restauranteId}")
-	public Restaurante atualizar(@PathVariable long restauranteId, @RequestBody @Valid Restaurante restaurante) {
+	public RestauranteModel atualizar(@PathVariable long restauranteId, @RequestBody @Valid Restaurante restaurante) {
 
 		Restaurante restauranteAtual = cadastroRestaurante.buscarOuFalhar(restauranteId);
 
 		BeanUtils.copyProperties(restaurante, restauranteAtual, "id", "formaPagamento", "endereco", "dataCadastro",
 				"dataAtaualizacao", "produtos");
 		try {
-			return cadastroRestaurante.salvar(restauranteAtual);
+			return toModel(cadastroRestaurante.salvar(restauranteAtual));
 		} catch (EntidadeNaoEncontradaException e) {
 			throw new NegocioException(e.getMessage());
 		}
 	}
 
 	@PatchMapping("/{restauranteId}")
-	public Restaurante atualizarParcial(@PathVariable Long restauranteId, 
+	public RestauranteModel atualizarParcial(@PathVariable Long restauranteId, 
 			@RequestBody Map<String, Object> campos,HttpServletRequest request) {
 		
 		Restaurante restauranteAtual = cadastroRestaurante.buscarOuFalhar(restauranteId);
@@ -162,6 +168,23 @@ public class RestauranteController {
 
 		cadastroRestaurante.excluir(restauranteId);
 
+	}private RestauranteModel toModel(Restaurante restaurante) {
+		CozinhaModel cozinhaModel = new CozinhaModel();
+			cozinhaModel.setId(restaurante.getCozinha().getId());
+			cozinhaModel.setNome(restaurante.getCozinha().getNome());
+		
+		 RestauranteModel restauranteModel= new RestauranteModel();
+			 restauranteModel.setId(restaurante.getId());
+			 restauranteModel.setNome(restaurante.getNome());
+			 restauranteModel.setTaxaFrete(restaurante.getTaxaFrete());
+			 restauranteModel.setCozinha(cozinhaModel);
+		return restauranteModel;
+	}
+
+	private List<RestauranteModel> toCollectioModel(List<Restaurante> restaurantes){
+		return restaurantes.stream()
+				.map( (restaurante) -> toModel(restaurante))
+				.collect(Collectors.toList());
 	}
 
 }

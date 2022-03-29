@@ -1,6 +1,5 @@
 package com.algafood.cursoapi;
 
-import static io.restassured.RestAssured.basePath;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.CoreMatchers.equalTo;
 
