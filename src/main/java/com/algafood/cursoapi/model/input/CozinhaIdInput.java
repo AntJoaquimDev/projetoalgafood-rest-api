@@ -1,5 +1,7 @@
 package com.algafood.cursoapi.model.input;
 
+import javax.validation.constraints.NotNull;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -7,5 +9,6 @@ import lombok.Setter;
 @Setter
 public class CozinhaIdInput {
 
+	@NotNull
 	private Long id;
 }
